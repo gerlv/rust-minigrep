@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::process;
+use std::error::Error;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,10 +13,17 @@ fn main() {
     println!("Query: {0}", config.query);
     println!("File path: {0}", config.file_path);
 
-    let contents = fs::read_to_string(config.file_path)
-        .expect("Poem to exist");
-    
+    if let Err(e) = run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
     println!("File contents:\n{contents}");
+
+    Ok(())
 }
 
 struct Config {
